@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>メディアリテラシー チャレンジ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+            padding: 30px 0;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: none;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            color: #34495e;
+        }
+
+        .game-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            border: 1px solid #e8ecef;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .question-card {
+            border: 2px solid #e8ecef;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            background: #fdfdfd;
+        }
+
+        .question-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(52, 152, 219, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .question-card:hover::before {
+            left: 100%;
+        }
+
+        .news-source {
+            display: inline-block;
+            background: #f5f5f5;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            color: #666;
+        }
+
+        .news-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .news-content {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: #555;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .choice-btn {
+            flex: 1;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .real-btn {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .fake-btn {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            color: white;
+        }
+
+        .choice-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .choice-btn:active {
+            transform: translateY(0);
+        }
+
+        .result {
+            text-align: center;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+
+        .result.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .correct {
+            background: linear-gradient(135deg, #c8e6c9, #a5d6a7);
+            color: #2e7d32;
+            border: 2px solid #4CAF50;
+        }
+
+        .incorrect {
+            background: linear-gradient(135deg, #ffcdd2, #ef9a9a);
+            color: #c62828;
+            border: 2px solid #f44336;
+        }
+
+        .explanation {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+            border-left: 4px solid #2196F3;
+        }
+
+        .explanation h4 {
+            color: #2196F3;
+            margin-bottom: 10px;
+        }
+
+        .score-display {
+            text-align: center;
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .next-btn {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            padding: 15px;
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.3);
+        }
+
+        .final-score {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 1px solid #e8ecef;
+        }
+
+        .final-score h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px auto;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .restart-btn {
+            background: linear-gradient(135deg, #9C27B0, #7B1FA2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(156, 39, 176, 0.3);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 0.5s ease-in-out;
+        }
+
+        .tips {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .tips h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .tips ul {
+            color: #856404;
+            margin-left: 20px;
+        }
+
+        .tips li {
+            margin-bottom: 5px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧠 メディアリテラシー チャレンジ</h1>
+            <p>フェイクニュースを見抜く力を鍛えよう！</p>
+        </div>
+
+        <div id="gameArea">
+            <div class="score-display">
+                スコア: <span id="score">0</span> / <span id="total">5</span>
+            </div>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <div class="game-container">
+                <div id="questionContainer">
+                    <!-- Questions will be loaded here -->
+                </div>
+                
+                <div id="resultContainer" style="display: none;">
+                    <!-- Results will be shown here -->
+                </div>
+            </div>
+        </div>
+
+        <div id="finalScore" style="display: none;">
+            <!-- Final score will be shown here -->
+        </div>
+
+        <div class="tips">
+            <h4>💡 フェイクニュースを見抜くコツ</h4>
+            <ul>
+                <li>情報源の信頼性を確認する</li>
+                <li>他の情報源でも確認する</li>
+                <li>感情的になりすぎていないか確認する</li>
+                <li>日付や統計データが正確か確認する</li>
+                <li>写真や動画が本物か疑う</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                source: "科学ニュース24",
+                title: "新発見！チョコレートを毎日食べると100%痩せることが判明",
+                content: "アメリカの研究機関が発表した最新研究によると、チョコレートを毎日200g食べ続けた被験者全員が1ヶ月で10kg以上の減量に成功したとのことです。研究者は「チョコレートに含まれる特殊な成分が脂肪を完全に燃焼させる」と説明しています。",
+                answer: "fake",
+                explanation: "「100%」「全員が」「完全に」など極端な表現が使われています。また、チョコレートで痩せるという非常識な内容で、具体的な研究機関名や論文の引用もありません。"
+            },
+            {
+                source: "NHKニュース",
+                title: "東京都、来年度から高校生の通学費補助制度を検討",
+                content: "東京都は来年度から、都内の高校生を対象とした通学費補助制度の導入を検討していることを発表しました。小池知事は記者会見で「家庭の経済状況に関わらず、すべての子どもたちが教育を受けられる環境を整えたい」と述べました。制度の詳細は今後検討されます。",
+                answer: "real",
+                explanation: "信頼できる報道機関（NHK）からの情報で、具体的な人物（小池知事）の発言が引用されています。内容も現実的で、極端な表現は使われていません。"
+            },
+            {
+                source: "健康情報まとめサイト",
+                title: "医師が絶対に教えない！がんが3日で完治する奇跡の方法",
+                content: "製薬会社が隠し続けてきた衝撃の事実が明らかに。ある特殊な植物を煮出した水を飲むだけで、どんな末期がんでも3日以内に完全に治ることが分かりました。世界中の医師がこの事実を隠している理由とは？今すぐ詳細をチェック！",
+                answer: "fake",
+                explanation: "医学的に不可能な内容（がんが3日で完治）で、「医師が隠している」「製薬会社の陰謀」などの陰謀論的表現が使われています。感情を煽る表現も典型的なフェイクニュースの特徴です。"
+            },
+            {
+                source: "朝日新聞",
+                title: "気象庁、今夏の気温が平年より2度高くなる見通しと発表",
+                content: "気象庁は今日の会見で、今年夏の平均気温が平年より2度程度高くなる見通しであると発表しました。ラニーニャ現象の影響により、7月から9月にかけて記録的な暑さになる可能性があるとして、熱中症対策の徹底を呼びかけています。",
+                answer: "real",
+                explanation: "信頼できる報道機関と公的機関（気象庁）からの情報で、科学的根拠（ラニーニャ現象）も示されています。内容も現実的で具体的です。"
+            },
+            {
+                source: "ウワサの真相",
+                title: "政府が隠す真実！5Gの電波で日本人の脳を操作する計画が始動",
+                content: "政府関係者からの極秘情報によると、5Gの電波を使って国民の思考をコントロールする極秘プロジェクトが水面下で進行中。すでに一部地域で実験が開始されており、住民の行動パターンに明らかな変化が見られているとのこと。この真実を知った記者は次々と行方不明になっている。",
+                answer: "fake",
+                explanation: "科学的根拠のない陰謀論で、「政府が隠す」「極秘情報」「記者が行方不明」など不安を煽る表現が多用されています。5Gで脳を操作するという非科学的な内容です。"
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let gameStarted = false;
+
+        function updateProgress() {
+            const progress = ((currentQuestion) / questions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function updateScore() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('total').textContent = questions.length;
+        }
+
+        function showQuestion() {
+            if (currentQuestion >= questions.length) {
+                showFinalScore();
+                return;
+            }
+
+            const question = questions[currentQuestion];
+            const container = document.getElementById('questionContainer');
+            
+            container.innerHTML = `
+                <div class="question-card">
+                    <div class="news-source">${question.source}</div>
+                    <div class="news-title">${question.title}</div>
+                    <div class="news-content">${question.content}</div>
+                    <div class="button-group">
+                        <button class="choice-btn real-btn" onclick="answerQuestion('real')">
+                            ✅ 本当のニュース
+                        </button>
+                        <button class="choice-btn fake-btn" onclick="answerQuestion('fake')">
+                            ❌ フェイクニュース
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('resultContainer').style.display = 'none';
+            updateProgress();
+        }
+
+        function answerQuestion(answer) {
+            const question = questions[currentQuestion];
+            const isCorrect = answer === question.answer;
+            
+            if (isCorrect) {
+                score++;
+                updateScore();
+            }
+
+            // Add pulse animation to score
+            document.querySelector('.score-display').classList.add('pulse');
+            setTimeout(() => {
+                document.querySelector('.score-display').classList.remove('pulse');
+            }, 500);
+
+            showResult(isCorrect, question.explanation);
+            
+            // Disable buttons
+            const buttons = document.querySelectorAll('.choice-btn');
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                btn.style.opacity = '0.6';
+                btn.style.cursor = 'not-allowed';
+            });
+        }
+
+        function showResult(isCorrect, explanation) {
+            const container = document.getElementById('resultContainer');
+            const resultClass = isCorrect ? 'correct' : 'incorrect';
+            const resultText = isCorrect ? '🎉 正解！' : '😅 不正解...';
+            
+            container.innerHTML = `
+                <div class="result ${resultClass}">
+                    ${resultText}
+                </div>
+                <div class="explanation">
+                    <h4>💡 解説</h4>
+                    <p>${explanation}</p>
+                </div>
+                <button class="next-btn" onclick="nextQuestion()">
+                    ${currentQuestion + 1 >= questions.length ? '結果を見る' : '次の問題へ'}
+                </button>
+            `;
+            
+            container.style.display = 'block';
+            
+            // Animate result appearance
+            setTimeout(() => {
+                container.querySelector('.result').classList.add('show');
+            }, 100);
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            showQuestion();
+        }
+
+        function showFinalScore() {
+            document.getElementById('gameArea').style.display = 'none';
+            
+            const percentage = Math.round((score / questions.length) * 100);
+            let message = '';
+            let circleColor = '';
+            
+            if (percentage >= 80) {
+                message = '🏆 素晴らしい！メディアリテラシーマスターです！';
+                circleColor = 'linear-gradient(135deg, #4CAF50, #45a049)';
+            } else if (percentage >= 60) {
+                message = '👍 良い判断力を持っています！';
+                circleColor = 'linear-gradient(135deg, #FF9800, #F57C00)';
+            } else {
+                message = '📚 もう少し練習が必要かも。でも大丈夫！';
+                circleColor = 'linear-gradient(135deg, #2196F3, #1976D2)';
+            }
+            
+            document.getElementById('finalScore').innerHTML = `
+                <div class="final-score">
+                    <h2>結果発表！</h2>
+                    <div class="score-circle" style="background: ${circleColor}">
+                        ${percentage}%
+                    </div>
+                    <p style="font-size: 1.2rem; margin: 20px 0;">${score}/${questions.length} 問正解</p>
+                    <p style="font-size: 1.1rem; color: #666;">${message}</p>
+                    <button class="restart-btn" onclick="restartGame()">
+                        🔄 もう一度チャレンジ
+                    </button>
+                </div>
+            `;
+            
+            document.getElementById('finalScore').style.display = 'block';
+        }
+
+        function restartGame() {
+            currentQuestion = 0;
+            score = 0;
+            updateScore();
+            document.getElementById('finalScore').style.display = 'none';
+            document.getElementById('gameArea').style.display = 'block';
+            showQuestion();
+        }
+
+        // Initialize the game
+        updateScore();
+        showQuestion();
+    </script>
+</body>
+</html>
